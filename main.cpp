@@ -48,9 +48,12 @@ int main() {
         }
     }
 
-    <  
+    vector2 last;
+    std::vector<vector2> newPoint;
+
     for (auto i: points) {
-        std::cout << i.X << "," << i.Y << std::endl;
+        //std::cout << i.X << "," << i.Y << std::endl;
+        last = i;
     }
 
 
