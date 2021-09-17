@@ -2,26 +2,27 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cmath> // float absolute
 
 struct vector2 { // 3d vector struture
-    long X, Y;
+    float X, Y;
     inline vector2( void ) {}
-    inline vector2( const long x, const long y) { X = x; Y = y; }
+    inline vector2( const float x, const float y) { X = x; Y = y; }
 };
 
-int returnPosition(vector2 A) { return (A.X) + (A.Y); }
-int returnMagnitude(vector2 A, vector2 B) { return abs(A.X - B.X) + abs(A.Y - B.Y); }
+float returnPosition(vector2 A) { return (A.X) + (A.Y); }
+float returnMagnitude(vector2 A, vector2 B) { return std::abs(A.X - B.X) + std::abs(A.Y - B.Y); }
 
-std::vector<vector2> positionSort(std::vector<vector2> points) {
+std::vector<vector2> positionSort(std::vector<vector2> points) { // Sort coordinates by position, initial rough sort
     std::vector<vector2> pointsCopy;
     for (auto i: points) {
         pointsCopy.push_back(i);
     }
 
     std::vector<vector2> sortedPoints;
-    int lowestVectorPosition;
+    float lowestVectorPosition;
     for (auto i : pointsCopy) {
-        int lowestPosition = 100000000;
+        float lowestPosition = 100000000;
 
         for(int v=0; v < pointsCopy.size(); v++){
             if ( returnPosition(pointsCopy.at(v)) < lowestPosition) {
@@ -37,6 +38,7 @@ std::vector<vector2> positionSort(std::vector<vector2> points) {
 
         pointsCopy.erase(pointsCopy.begin() + lowestVectorPosition);
     }
+
     return sortedPoints;
 }
 
@@ -47,7 +49,7 @@ std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires th
     }
 
     std::vector<vector2> sortedPoints;
-    int lowestMagPosition;
+    float lowestMagPosition;
 
     vector2 last;
     last.X = pointsCopy.at(0).X;
@@ -58,10 +60,11 @@ std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires th
     
     while (pointsCopy.size() != 0) {
         vector2 closestPoint;
-        int lowestMagnitude = 100000000;
+        float lowestMagnitude = 100000000;
 
         for(int v=0; v < pointsCopy.size(); v++){
-            //std::cout << "MAGNITUDE FROM: " << last.X << "," << last.Y << "-" << pointsCopy.at(v).X << "," << pointsCopy.at(v).Y << " MAG:" << returnMagnitude(last,pointsCopy.at(v)) << std::endl;
+            
+            std::cout << "MAGNITUDE FROM: (" << last.X << ", " << last.Y << ") TO (" << pointsCopy.at(v).X << ", " << pointsCopy.at(v).Y << ") - MAG:" << returnMagnitude(last,pointsCopy.at(v)) << std::endl;
 
             if ( !(last.X == pointsCopy.at(v).X && last.Y == pointsCopy.at(v).Y)
             && returnMagnitude(last,pointsCopy.at(v)) < lowestMagnitude) {
@@ -76,7 +79,7 @@ std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires th
         newVector.Y = closestPoint.Y;
         sortedPoints.push_back(newVector);
 
-        //std::cout << "CLOSEST: " << last.X << "," << last.Y << "-" << newVector.X << "," << newVector.Y << " MAG:" << returnMagnitude(last,newVector) << std::endl;
+        std::cout << "CLOSEST: (" << last.X << ", " << last.Y << ") TO (" << newVector.X << ", " << newVector.Y << ") - MAG: " << returnMagnitude(last,newVector) << std::endl;
 
         last.X = pointsCopy.at(lowestMagPosition).X;
         last.Y = pointsCopy.at(lowestMagPosition).Y;
@@ -89,6 +92,18 @@ std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires th
     }
 
     return sortedPoints;
+}
+
+void exportPoints( std::vector<vector2> points, std::string outputFileName ) { // Export points to file
+    std::ofstream outFile(outputFileName); // New file (overwrite if already exists)
+    outFile << "x,y" << std::endl;
+
+    for ( auto i: points ){
+        outFile << i.X << "," << i.Y << "," << std::endl;
+    }
+    outFile.close();
+
+   //std::cout << "Exported " << points.size() << " points" << std::endl;
 }
 
 int main() {
@@ -126,7 +141,9 @@ int main() {
     }
 
     std::vector<vector2> newPoints = positionSort(points);
-    magnitudeSort(newPoints);
+    std::vector<vector2> sortedPoints = magnitudeSort(newPoints);
+
+    exportPoints(sortedPoints,"output.csv");
 
     return 0;
 }
