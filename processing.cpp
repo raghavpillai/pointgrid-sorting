@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <cmath> // float absolute
+#include <ctime> // UNIX epoch time
 
 struct vector3 { // 3d vector struture
     float X, Y, Z;
@@ -19,6 +20,7 @@ float returnPosition(vector3 A) { return (A.X) + (A.Y) + (A.Z); }
 float returnMagnitude(vector3 A, vector3 B) { return std::abs(A.X - B.X) + std::abs(A.Y - B.Y) + std::abs(A.Z - B.Z); }
 
 std::vector<vector3> positionSort(std::vector<vector3> points) { // Sort coordinates by position, initial rough sort
+    std::time_t startTime = std::time(0);
     std::vector<vector3> sortedPoints;
     float lowestVectorPosition;
     for (auto i : points) {
@@ -40,11 +42,12 @@ std::vector<vector3> positionSort(std::vector<vector3> points) { // Sort coordin
         points.erase(points.begin() + lowestVectorPosition);
     }
 
-    std::cout << "Position sorted " << sortedPoints.size() << " points" << std::endl;
+    std::cout << "Position sorted " << sortedPoints.size() << " points in " << std::time(0) - startTime << " seconds" << std::endl;
     return sortedPoints;
 }
 
 std::vector<vector3> magnitudeSort(std::vector<vector3> points) { // Requires the lowest point to be on position 0
+    std::time_t startTime = std::time(0);
     std::vector<vector3> sortedPoints;
     float lowestMagPosition;
 
@@ -85,11 +88,12 @@ std::vector<vector3> magnitudeSort(std::vector<vector3> points) { // Requires th
         points.erase(points.begin() + lowestMagPosition);
     }
 
-    std::cout << "Magnitude sorted " << sortedPoints.size() << " points" << std::endl;
+    std::cout << "Magnitude sorted " << sortedPoints.size() << " points in " << std::time(0) - startTime << " seconds" << std::endl;
     return sortedPoints;
 }
 
 std::vector<vector3> ingest( std::string inFileName ) {
+    std::time_t startTime = std::time(0);
     std::string line;
     std::vector<vector3> points;
     std::ifstream inFile(inFileName);
@@ -116,11 +120,12 @@ std::vector<vector3> ingest( std::string inFileName ) {
         }
     }
 
-    std::cout << "Ingested " << points.size() << " points" << std::endl;
+    std::cout << "Ingested " << points.size() << " points in " << std::time(0) - startTime << " seconds" << std::endl;
     return points;
 }
 
 void exportPoints( std::vector<vector3> points, std::string outputFileName ) { // Export points to file
+    std::time_t startTime = std::time(0);
     std::ofstream outFile(outputFileName); // New file (overwrite if already exists)
     outFile << "x,y,z" << std::endl;
 
@@ -129,13 +134,13 @@ void exportPoints( std::vector<vector3> points, std::string outputFileName ) { /
     }
     outFile.close();
 
-   std::cout << "Exported " << points.size() << " points" << std::endl;
+   std::cout << "Exported " << points.size() << " points in " << std::time(0) - startTime << " seconds" << std::endl;
 }
 
 int main() {
     // get info
     std::string inName, outName;
-
+    
     /*std::cout << "Enter .csv file name" << std::endl;
     std::cin >> inName;
 
@@ -143,7 +148,7 @@ int main() {
     std::cin >> outName;*/
 
     std::cout << "\nIngesting data" << std::endl;
-    std::vector<vector3> inPoints = ingest("input.csv"); // Ingest
+    std::vector<vector3> inPoints = ingest("input2.csv"); // Ingest
 
     std::vector<vector3> newPoints = positionSort(inPoints);
     std::vector<vector3> sortedPoints = magnitudeSort(newPoints);
