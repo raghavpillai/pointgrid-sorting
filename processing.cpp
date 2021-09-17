@@ -9,31 +9,86 @@ struct vector2 { // 3d vector struture
     inline vector2( const long x, const long y) { X = x; Y = y; }
 };
 
-int returnMagnitude(vector2 A, vector2 B) {
-    return abs(A.X - B.X) + abs(A.Y - B.Y);
-}
+int returnPosition(vector2 A) { return (A.X) + (A.Y); }
+int returnMagnitude(vector2 A, vector2 B) { return abs(A.X - B.X) + abs(A.Y - B.Y); }
 
-std::vector<vector2> sortVector(std::vector<vector2> points) {
-    std::vector<vector2> newPoints;
-    
+std::vector<vector2> positionSort(std::vector<vector2> points) {
+    std::vector<vector2> pointsCopy;
     for (auto i: points) {
-        vector2 closestPoint;
-
-        int lowestMagnitude = 100000000;
-        for (auto v: points) {
-            //std::cout << (i.X == v.X && i.Y == v.Y) << " SAME (" << i.X << "," << i.Y << "  -  " << v.X << "," << v.Y << ")" << std::endl;
-            //std::cout << (returnMagnitude(i,v) < lowestMagnitude) << " LESS (" << i.X << "," << i.Y << "  -  " << v.X << "," << v.Y << ")" << std::endl;
-            
-            if ( !(i.X == v.X && i.Y == v.Y) && returnMagnitude(i,v) < lowestMagnitude) {
-                lowestMagnitude = returnMagnitude(i,v);
-                closestPoint = v;
-            }
-        }
-        
-        std::cout << "CLOSEST TO (" << i.X << "," << i.Y << "): (" << closestPoint.X << "," << closestPoint.Y << "), MAGNITUDE: " << lowestMagnitude << std::endl;
+        pointsCopy.push_back(i);
     }
 
-    return newPoints;
+    std::vector<vector2> sortedPoints;
+    int lowestVectorPosition;
+    for (auto i : pointsCopy) {
+        int lowestPosition = 100000000;
+
+        for(int v=0; v < pointsCopy.size(); v++){
+            if ( returnPosition(pointsCopy.at(v)) < lowestPosition) {
+                lowestPosition = returnPosition(pointsCopy.at(v));
+                lowestVectorPosition = v;
+            }
+        }
+        vector2 newVector;
+        newVector.X = pointsCopy.at(lowestVectorPosition).X;
+        newVector.Y = pointsCopy.at(lowestVectorPosition).Y;
+
+        sortedPoints.push_back(newVector);
+
+        pointsCopy.erase(pointsCopy.begin() + lowestVectorPosition);
+    }
+    return sortedPoints;
+}
+
+std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires the lowest point to be on position 0
+    std::vector<vector2> pointsCopy;
+    for (auto i: points) {
+        pointsCopy.push_back(i);
+    }
+
+    std::vector<vector2> sortedPoints;
+    int lowestMagPosition;
+
+    vector2 last;
+    last.X = pointsCopy.at(0).X;
+    last.Y = pointsCopy.at(0).Y;
+    sortedPoints.push_back(last);
+
+    pointsCopy.erase(pointsCopy.begin());
+    
+    while (pointsCopy.size() != 0) {
+        vector2 closestPoint;
+        int lowestMagnitude = 100000000;
+
+        for(int v=0; v < pointsCopy.size(); v++){
+            //std::cout << "MAGNITUDE FROM: " << last.X << "," << last.Y << "-" << pointsCopy.at(v).X << "," << pointsCopy.at(v).Y << " MAG:" << returnMagnitude(last,pointsCopy.at(v)) << std::endl;
+
+            if ( !(last.X == pointsCopy.at(v).X && last.Y == pointsCopy.at(v).Y)
+            && returnMagnitude(last,pointsCopy.at(v)) < lowestMagnitude) {
+                lowestMagnitude = returnMagnitude(last,pointsCopy.at(v));
+                closestPoint = pointsCopy.at(v);
+                lowestMagPosition = v;
+            }
+        }
+
+        vector2 newVector;
+        newVector.X = closestPoint.X;
+        newVector.Y = closestPoint.Y;
+        sortedPoints.push_back(newVector);
+
+        //std::cout << "CLOSEST: " << last.X << "," << last.Y << "-" << newVector.X << "," << newVector.Y << " MAG:" << returnMagnitude(last,newVector) << std::endl;
+
+        last.X = pointsCopy.at(lowestMagPosition).X;
+        last.Y = pointsCopy.at(lowestMagPosition).Y;
+
+        pointsCopy.erase(pointsCopy.begin() + lowestMagPosition);
+    }
+
+    for (auto i: sortedPoints){
+        std::cout << i.X << "," << i.Y << std::endl;
+    }
+
+    return sortedPoints;
 }
 
 int main() {
@@ -70,9 +125,8 @@ int main() {
         }
     }
 
-    sortVector(points);
-
-
+    std::vector<vector2> newPoints = positionSort(points);
+    magnitudeSort(newPoints);
 
     return 0;
 }
