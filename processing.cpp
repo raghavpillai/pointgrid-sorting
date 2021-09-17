@@ -14,62 +14,52 @@ float returnPosition(vector2 A) { return (A.X) + (A.Y); }
 float returnMagnitude(vector2 A, vector2 B) { return std::abs(A.X - B.X) + std::abs(A.Y - B.Y); }
 
 std::vector<vector2> positionSort(std::vector<vector2> points) { // Sort coordinates by position, initial rough sort
-    std::vector<vector2> pointsCopy;
-    for (auto i: points) {
-        pointsCopy.push_back(i);
-    }
-
     std::vector<vector2> sortedPoints;
     float lowestVectorPosition;
-    for (auto i : pointsCopy) {
+    for (auto i : points) {
         float lowestPosition = 100000000;
 
-        for(int v=0; v < pointsCopy.size(); v++){
-            if ( returnPosition(pointsCopy.at(v)) < lowestPosition) {
-                lowestPosition = returnPosition(pointsCopy.at(v));
+        for(int v=0; v < points.size(); v++){
+            if ( returnPosition(points.at(v)) < lowestPosition) {
+                lowestPosition = returnPosition(points.at(v));
                 lowestVectorPosition = v;
             }
         }
         vector2 newVector;
-        newVector.X = pointsCopy.at(lowestVectorPosition).X;
-        newVector.Y = pointsCopy.at(lowestVectorPosition).Y;
+        newVector.X = points.at(lowestVectorPosition).X;
+        newVector.Y = points.at(lowestVectorPosition).Y;
 
         sortedPoints.push_back(newVector);
 
-        pointsCopy.erase(pointsCopy.begin() + lowestVectorPosition);
+        points.erase(points.begin() + lowestVectorPosition);
     }
 
     return sortedPoints;
 }
 
 std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires the lowest point to be on position 0
-    std::vector<vector2> pointsCopy;
-    for (auto i: points) {
-        pointsCopy.push_back(i);
-    }
-
     std::vector<vector2> sortedPoints;
     float lowestMagPosition;
 
     vector2 last;
-    last.X = pointsCopy.at(0).X;
-    last.Y = pointsCopy.at(0).Y;
+    last.X = points.at(0).X;
+    last.Y = points.at(0).Y;
     sortedPoints.push_back(last);
 
-    pointsCopy.erase(pointsCopy.begin());
+    points.erase(points.begin());
     
-    while (pointsCopy.size() != 0) {
+    while (points.size() != 0) {
         vector2 closestPoint;
         float lowestMagnitude = 100000000;
 
-        for(int v=0; v < pointsCopy.size(); v++){
+        for(int v=0; v < points.size(); v++){
             
-            std::cout << "MAGNITUDE FROM: (" << last.X << ", " << last.Y << ") TO (" << pointsCopy.at(v).X << ", " << pointsCopy.at(v).Y << ") - MAG:" << returnMagnitude(last,pointsCopy.at(v)) << std::endl;
+            std::cout << "MAGNITUDE FROM: (" << last.X << ", " << last.Y << ") TO (" << points.at(v).X << ", " << points.at(v).Y << ") - MAG:" << returnMagnitude(last,points.at(v)) << std::endl;
 
-            if ( !(last.X == pointsCopy.at(v).X && last.Y == pointsCopy.at(v).Y)
-            && returnMagnitude(last,pointsCopy.at(v)) < lowestMagnitude) {
-                lowestMagnitude = returnMagnitude(last,pointsCopy.at(v));
-                closestPoint = pointsCopy.at(v);
+            if ( !(last.X == points.at(v).X && last.Y == points.at(v).Y)
+            && returnMagnitude(last,points.at(v)) < lowestMagnitude) {
+                lowestMagnitude = returnMagnitude(last,points.at(v));
+                closestPoint = points.at(v);
                 lowestMagPosition = v;
             }
         }
@@ -81,10 +71,10 @@ std::vector<vector2> magnitudeSort(std::vector<vector2> points) { // Requires th
 
         std::cout << "CLOSEST: (" << last.X << ", " << last.Y << ") TO (" << newVector.X << ", " << newVector.Y << ") - MAG: " << returnMagnitude(last,newVector) << std::endl;
 
-        last.X = pointsCopy.at(lowestMagPosition).X;
-        last.Y = pointsCopy.at(lowestMagPosition).Y;
+        last.X = points.at(lowestMagPosition).X;
+        last.Y = points.at(lowestMagPosition).Y;
 
-        pointsCopy.erase(pointsCopy.begin() + lowestMagPosition);
+        points.erase(points.begin() + lowestMagPosition);
     }
 
     for (auto i: sortedPoints){
